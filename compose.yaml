@@ -1,13 +1,55 @@
 services:
   postgres:
-    image: 'postgres:latest'
+    container_name: postgres_db_inote
+    image: postgres:latest
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: inote
     ports:
-      - '5432'
+      - 5432:5432
+    networks:
+      - app-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  iNote:
+    container_name: inote_app
+    image: inote:latest
+    build:
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inote
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
+      SPRING_LIQUIBASE_ENABLED: true
+      SPRING_CACHE_TYPE: redis
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      REDIS_DATABASE: 0
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - app-network
+    ports:
+      - 8080:8080
+
   redis:
-    image: 'redis:latest'
+    container_name: redis_inote
+    image: redis:latest
     ports:
-      - '6379'
+      - 6379:6379
+    networks:
+      - app-network
+    volumes:
+      - redis_data:/var/lib/redis/data
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
