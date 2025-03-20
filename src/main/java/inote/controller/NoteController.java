@@ -1,18 +1,17 @@
 package inote.controller;
 
-
 import inote.entity.Note;
-import inote.entity.User;
 import inote.service.NoteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,12 +23,11 @@ import java.util.Optional;
 @Tag(name = "Контроллер для управления заметками")
 @RestController
 @Slf4j
-@RequestMapping("/library/notes")
+@RequestMapping("/inote/notes")
 @RequiredArgsConstructor
 public class NoteController {
 
     private final NoteService noteService;
-    private static final Logger logger = LoggerFactory.getLogger(NoteController.class);
 
     @Operation(summary = "Получение списка всех заметок")
     @GetMapping
@@ -38,7 +36,7 @@ public class NoteController {
         long startTime = System.currentTimeMillis();
         List<Note> notes = noteService.findAll();
         long duration = System.currentTimeMillis() - startTime;
-        logger.info("Duration = {}", duration);
+        log.info("Duration = {}", duration);
         log.info("getAllNotes - end, notesCount = {}", notes.size());
         return ResponseEntity.ok(notes);
     }
@@ -58,23 +56,6 @@ public class NoteController {
         return ResponseEntity.ok(note.get());
     }
 
-    @Operation(summary = "Получение заметок пользователя")
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Note>> getNotesByUser(@PathVariable Long userId) {
-        log.info("getNotesByUser - start, userId = {}", userId);
-        User user = new User();
-        user.setId(userId);
-        List<Note> notes = noteService.findByUser(user);
-
-        if (notes.isEmpty()) {
-            log.warn("getNotesByUser - заметки для пользователя с ID {} не найдены", userId);
-            return ResponseEntity.notFound().build();
-        }
-
-        log.info("getNotesByUser - end, notesCount = {}", notes.size());
-        return ResponseEntity.ok(notes);
-    }
-
     @Operation(summary = "Получение заметок по заголовку")
     @GetMapping("/title/{title}")
     public ResponseEntity<List<Note>> getNotesByTitle(@PathVariable String title) {
@@ -87,6 +68,32 @@ public class NoteController {
         }
 
         log.info("getNotesByTitle - end, notesCount = {}", notes.size());
+        return ResponseEntity.ok(notes);
+    }
+
+    @Operation(summary = "Получение заметок, созданных в указанный период")
+    @GetMapping("/created-between")
+    public ResponseEntity<List<Note>> getNotesByCreatedAtBetween(
+        @RequestParam("startDate")
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+
+        @RequestParam("endDate")
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate
+    ) {
+        log.info("getNotesByCreatedAtBetween - start, startDate = {}, endDate = {}", startDate, endDate);
+
+        // Преобразуем LocalDate в LocalDateTime (с 00:00:00 до 23:59:59)
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        List<Note> notes = noteService.findByCreatedAtBetween(startDateTime, endDateTime);
+
+        if (notes.isEmpty()) {
+            log.warn("getNotesByCreatedAtBetween - заметки не найдены в указанный период");
+            return ResponseEntity.notFound().build();
+        }
+
+        log.info("getNotesByCreatedAtBetween - end, notesCount = {}", notes.size());
         return ResponseEntity.ok(notes);
     }
 

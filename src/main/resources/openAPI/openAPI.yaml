@@ -1,0 +1,238 @@
+openapi: 3.0.3
+info:
+  title: iNote
+  description: API для работы с заметками
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/inote
+    description: Dev server
+
+paths:
+  /notes:
+    get:
+      tags:
+        - GET-запросы
+      summary: Получить список всех заметок
+      operationId: getAllNotes
+      responses:
+        '200':
+          description: Успешный ответ со списком заметок
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notes'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Запросы изменяющие данные
+      summary: Добавить новую заметку
+      operationId: addNote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      responses:
+        '200':
+          description: Заметка успешно добавлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notes/{noteId}:
+    get:
+      tags:
+        - GET-запросы
+      summary: Получить заметку по ID
+      operationId: getNoteById
+      parameters:
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Заметка найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '404':
+          description: Заметка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Запросы изменяющие данные
+      summary: Обновить заметку
+      operationId: updateNote
+      parameters:
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      responses:
+        '200':
+          description: Заметка обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '404':
+          description: Заметка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Запросы изменяющие данные
+      summary: Удалить заметку
+      operationId: deleteNote
+      parameters:
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Заметка удалена
+        '404':
+          description: Заметка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notes/title/{title}:
+    get:
+      tags:
+        - GET-запросы
+      summary: Найти заметки по заголовку
+      operationId: getNotesByTitle
+      parameters:
+        - name: title
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Найдены заметки с указанным заголовком
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notes'
+        '404':
+          description: Заметки не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notes/created-between:
+    get:
+      tags:
+        - GET-запросы
+      summary: Найти заметки по дате создания
+      operationId: getNotesByCreatedAtBetween
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Найдены заметки за указанный период
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notes'
+        '404':
+          description: Заметки не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Notes:
+      type: array
+      items:
+        $ref: '#/components/schemas/Note'
+
+    Note:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
