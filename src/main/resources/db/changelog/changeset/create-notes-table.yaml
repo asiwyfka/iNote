@@ -4,7 +4,7 @@ databaseChangeLog:
       author: Avdeyev Viktor
       changes:
         - tagDatabase:
-           tag: step2
+            tag: step2
         - createTable:
             tableName: notes
             columns:
@@ -16,7 +16,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: title
-                  type: VARCHAR(255)
+                  type: VARCHAR(50)
                   constraints:
                     nullable: false
               - column:
@@ -33,19 +33,8 @@ databaseChangeLog:
               - column:
                   name: updated_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
-              - column:
-                  name: user_id
-                  type: INTEGER
                   constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            baseTableName: notes
-            baseColumnNames: user_id
-            referencedTableName: users
-            referencedColumnNames: id
-            constraintName: fk_notes_user_id
-            onDelete: CASCADE
+                    nullable: true
       rollback:
         - dropTable:
             tableName: notes

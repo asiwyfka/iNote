@@ -1,16 +1,14 @@
 package inote.service;
 
 import inote.entity.Note;
-import inote.entity.User;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Сервис для работы с {@link Note}.
- * <p>
+ *
  * Определяет основные операции для управления заметками.
- * </p>
  *
  * @author Avdeyev Viktor
  */
@@ -32,20 +30,21 @@ public interface NoteService {
     Optional<Note> findById(Long noteId);
 
     /**
-     * Поиск заметок пользователя.
-     *
-     * @param user пользователь, которому принадлежат заметки
-     * @return список заметок пользователя
-     */
-    List<Note> findByUser(User user);
-
-    /**
      * Поиск заметок по заголовку.
      *
      * @param title заголовок заметки
      * @return список заметок с указанным заголовком
      */
     List<Note> findByTitle(String title);
+
+    /**
+     * Поиск заметок, созданных в указанный период.
+     *
+     * @param startDate начальная дата
+     * @param endDate конечная дата
+     * @return список заметок, созданных в указанный период
+     */
+    List<Note> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     /**
      * Сохранение заметки.

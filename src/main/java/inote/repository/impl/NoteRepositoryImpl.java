@@ -1,7 +1,6 @@
 package inote.repository.impl;
 
 import inote.entity.Note;
-import inote.entity.User;
 import inote.repository.NoteRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -10,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,13 +39,10 @@ public class NoteRepositoryImpl implements NoteRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Note> findByUser(User user) {
-        log.info("Поиск заметок пользователя: {}", user.getUsername());
-        List<Note> notes = entityManager.createQuery("SELECT n FROM Note n WHERE n.user = :user", Note.class)
-            .setParameter("user", user)
-            .getResultList();
-        log.info("Найдено {} заметок для пользователя {}", notes.size(), user.getUsername());
-        return notes;
+    public Optional<Note> findById(Long id) {
+        log.info("Поиск заметки по ID: {}", id);
+        Note note = entityManager.find(Note.class, id);
+        return Optional.ofNullable(note);
     }
 
     @Override
@@ -60,14 +57,28 @@ public class NoteRepositoryImpl implements NoteRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Note> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        log.info("Поиск заметок, созданных между {} и {}", startDate, endDate);
+        List<Note> notes = entityManager.createQuery("SELECT n FROM Note n WHERE n.createdAt BETWEEN :startDate AND :endDate", Note.class)
+            .setParameter("startDate", startDate)
+            .setParameter("endDate", endDate)
+            .getResultList();
+        log.info("Найдено {} заметок, созданных в указанный период", notes.size());
+        return notes;
+    }
+
+    @Override
     @Transactional
     public Note save(Note note) {
         log.info("Сохранение заметки: {}", note);
         if (note.getId() == null) {
+            // Новая заметка
             entityManager.persist(note);
             log.info("Новая заметка сохранена: {}", note);
             return note;
         } else {
+            // Обновление существующей заметки
             Note updatedNote = entityManager.merge(note);
             log.info("Заметка обновлена: {}", updatedNote);
             return updatedNote;
@@ -83,10 +94,11 @@ public class NoteRepositoryImpl implements NoteRepository {
             log.warn("Заметка с ID {} не найдена для обновления", id);
             return Optional.empty();
         }
+
+        // Обновление только измененных полей
         Note note = optionalNote.get();
         note.setTitle(updatedNote.getTitle());
         note.setContent(updatedNote.getContent());
-        note.setUpdatedAt(updatedNote.getUpdatedAt() != null ? updatedNote.getUpdatedAt() : note.getUpdatedAt());
 
         note = entityManager.merge(note);
         log.info("Заметка обновлена: {}", note);
@@ -104,18 +116,5 @@ public class NoteRepositoryImpl implements NoteRepository {
         } else {
             log.warn("Заметка с ID {} не найдена для удаления", id);
         }
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Note> findById(Long id) {
-        log.info("Поиск заметки по ID: {}", id);
-        Note note = entityManager.find(Note.class, id);
-        if (note != null) {
-            log.info("Заметка с ID {} найдена", id);
-        } else {
-            log.warn("Заметка с ID {} не найдена", id);
-        }
-        return Optional.ofNullable(note);
     }
 }

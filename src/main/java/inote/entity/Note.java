@@ -1,14 +1,6 @@
 package inote.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +11,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Сущность, представляющая заметку пользователя.
- * Содержит информацию о названии, содержимом, авторе заметки и времени создания/обновления.
+ * Сущность, представляющая заметку.
+ * Содержит информацию о названии, содержимом и времени создания/обновления.
  *
  * @author Avdeyev Viktor
  */
@@ -53,15 +45,6 @@ public class Note implements Serializable {
      */
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
-
-    /**
-     * Автор заметки (пользователь).
-     * Ссылается на пользователя, который создал заметку.
-     * Это внешний ключ на таблицу пользователей.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     /**
      * Время создания заметки.
