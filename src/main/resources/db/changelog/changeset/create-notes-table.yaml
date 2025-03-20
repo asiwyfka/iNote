@@ -4,7 +4,7 @@ databaseChangeLog:
       author: Avdeyev Viktor
       changes:
         - tagDatabase:
-            tag: step2
+            tag: step1
         - createTable:
             tableName: notes
             columns:
@@ -35,6 +35,12 @@ databaseChangeLog:
                   type: TIMESTAMP
                   constraints:
                     nullable: true
+        - createIndex:
+            indexName: idx_title
+            tableName: notes
+            columns:
+              - column:
+                  name: title
       rollback:
         - dropTable:
             tableName: notes

@@ -29,7 +29,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-        - Запросы изменяющие данные
+        - Заметки
       summary: Добавить новую заметку
       operationId: addNote
       requestBody:
@@ -87,7 +87,7 @@ paths:
 
     put:
       tags:
-        - Запросы изменяющие данные
+        - Заметки
       summary: Обновить заметку
       operationId: updateNote
       parameters:
@@ -119,7 +119,7 @@ paths:
 
     delete:
       tags:
-        - Запросы изменяющие данные
+        - Заметки
       summary: Удалить заметку
       operationId: deleteNote
       parameters:

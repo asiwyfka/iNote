@@ -60,4 +60,12 @@ public class Note implements Serializable {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now(); // Устанавливаем значение createdAt
+        }
+        updatedAt = LocalDateTime.now(); // Также можно обновить updatedAt
+    }
 }
