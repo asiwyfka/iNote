@@ -44,7 +44,7 @@ public interface NoteRepository {
      * Найти заметки, созданные в указанный период.
      *
      * @param startDate начальная дата.
-     * @param endDate конечная дата.
+     * @param endDate   конечная дата.
      * @return список заметок, созданных в указанный период.
      */
     List<Note> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);

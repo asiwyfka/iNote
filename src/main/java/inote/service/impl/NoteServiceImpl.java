@@ -30,7 +30,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * Получить все заметки.
-     * Используется кэширование для хранения списка заметок.
+     * Используется кэширование с ключом 'allNotes' для хранения списка заметок.
      */
     @Override
     @Cacheable(value = "notes", key = "'allNotes'")
@@ -43,7 +43,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * Найти заметку по ID.
-     * Кэшируется результат для быстрого доступа по ID.
+     * Результат кэшируется для быстрого доступа по ID и предотвращения повторных запросов к базе данных.
      */
     @Override
     @Cacheable(value = "notes", key = "#noteId")
@@ -60,7 +60,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * Поиск заметок по заголовку.
-     * Кэшируется список заметок по заголовку.
+     * Результат кэшируется с использованием заголовка как ключа.
      */
     @Override
     @Cacheable(value = "notes", key = "#title")
@@ -77,6 +77,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * Поиск заметок, созданных в указанный период.
+     * Кэширование не используется для этого метода.
      */
     @Override
     public List<Note> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate) {
@@ -92,7 +93,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * Сохранение или обновление заметки.
-     * При сохранении заметки удаляется кэш для этой заметки.
+     * При сохранении заметки удаляется кэш для этой заметки, чтобы избежать использования устаревших данных.
      */
     @Override
     @CacheEvict(value = "notes", key = "#note.id")
@@ -105,7 +106,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * Обновление заметки по ID.
-     * Кэш обновляется только для конкретной заметки.
+     * Кэш обновляется только для этой заметки после успешного обновления.
      */
     @Override
     @CachePut(value = "notes", key = "#noteId")
@@ -126,7 +127,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * Удалить заметку по ID.
-     * Удаляется кэш для заметки, если она была удалена.
+     * Удаляется кэш для этой заметки, если она была успешно удалена.
      */
     @Override
     @CacheEvict(value = "notes", key = "#noteId")

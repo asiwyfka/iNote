@@ -35,12 +35,6 @@ databaseChangeLog:
                   type: TIMESTAMP
                   constraints:
                     nullable: true
-        - createIndex:
-            indexName: idx_title
-            tableName: notes
-            columns:
-              - column:
-                  name: title
       rollback:
         - dropTable:
             tableName: notes

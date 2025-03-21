@@ -47,7 +47,7 @@ public interface NoteService {
     List<Note> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     /**
-     * Сохранение заметки.
+     * Сохранение новой или обновление существующей заметки.
      *
      * @param note заметка для сохранения
      * @return сохраненная или обновленная заметка
@@ -59,7 +59,7 @@ public interface NoteService {
      *
      * @param noteId ID заметки для обновления
      * @param updatedNote объект с обновленными данными
-     * @return обновленная заметка
+     * @return Optional с обновленной заметкой, если она была найдена
      */
     Optional<Note> update(Long noteId, Note updatedNote);
 

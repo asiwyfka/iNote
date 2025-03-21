@@ -29,23 +29,39 @@ public class NoteRepositoryImplTest {
     @Mock
     private TypedQuery<Note> typedQuery; // Используем TypedQuery для выполнения запросов
 
-    private Note note;
+    private Note testNote; // Тестовая заметка для использования в тестах
 
     @BeforeEach
     public void setUp() {
         // Given: создаем объект заметки для использования в тестах
-        note = new Note();
-        note.setId(1L);
-        note.setTitle("Test Title");
-        note.setContent("Test Content");
+        testNote = new Note();
+        testNote.setId(1L);
+        testNote.setTitle("Test Title");
+        testNote.setContent("Test Content");
+    }
+
+    @Test
+    public void testFindAll_ShouldReturnNotes_WhenNotesExist() {
+        // Given: мокируем создание запроса с использованием EntityManager и результат
+        when(entityManager.createQuery("SELECT n FROM Note n", Note.class)).thenReturn(typedQuery);
+        when(typedQuery.getResultList()).thenReturn(Arrays.asList(testNote));
+
+        // When: вызываем метод репозитория
+        List<Note> result = noteRepository.findAll();
+
+        // Then: проверяем, что результат не пустой
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
     }
 
     @Test
     public void testFindByTitle_ShouldReturnNotes_WhenNotesExist() {
-        // Given: Мокируем создание запроса с использованием EntityManager, устанавливаем параметры и результат
-        when(entityManager.createQuery("SELECT n FROM Note n WHERE n.title = :title", Note.class)).thenReturn(typedQuery);
+        // Given: мокируем создание запроса с использованием EntityManager, устанавливаем параметры и результат
+        when(entityManager.createQuery("SELECT n FROM Note n WHERE n.title = :title", Note.class)).thenReturn(
+            typedQuery);
         when(typedQuery.setParameter("title", "Test Title")).thenReturn(typedQuery);
-        when(typedQuery.getResultList()).thenReturn(Arrays.asList(note)); // Мокируем список заметок с заданным заголовком
+        when(typedQuery.getResultList()).thenReturn(Arrays.asList(testNote));
 
         // When: вызываем метод репозитория для поиска по заголовку
         List<Note> result = noteRepository.findByTitle("Test Title");
@@ -64,8 +80,9 @@ public class NoteRepositoryImplTest {
 
     @Test
     public void testFindByTitle_ShouldReturnEmptyList_WhenNoNotesExist() {
-        // Given: Мокируем создание запроса с использованием EntityManager, устанавливаем параметры и результат
-        when(entityManager.createQuery("SELECT n FROM Note n WHERE n.title = :title", Note.class)).thenReturn(typedQuery);
+        // Given: мокируем создание запроса с использованием EntityManager, устанавливаем параметры и результат
+        when(entityManager.createQuery("SELECT n FROM Note n WHERE n.title = :title", Note.class)).thenReturn(
+            typedQuery);
         when(typedQuery.setParameter("title", "Nonexistent Title")).thenReturn(typedQuery);
         when(typedQuery.getResultList()).thenReturn(Arrays.asList());  // Мокируем пустой список
 
@@ -85,70 +102,68 @@ public class NoteRepositoryImplTest {
     @Test
     public void testSave_ShouldSaveNewNote_WhenNoteIsNew() {
         // Given: устанавливаем ID заметки как null, чтобы показать, что это новая заметка
-        note.setId(null);
+        testNote.setId(null);
 
-        // Мокаем persist для возврата заметки с установленным ID
+        // мокаем persist для возврата заметки с установленным ID
         doAnswer(invocation -> {
             Note savedNote = invocation.getArgument(0);
-            savedNote.setId(1L);  // Присваиваем ID для симуляции сохранения
+            savedNote.setId(1L);
             return null;
         }).when(entityManager).persist(any(Note.class));
 
         // When: вызываем метод save для сохранения новой заметки
-        Note savedNote = noteRepository.save(note);
+        Note savedNote = noteRepository.save(testNote);
 
         // Then: проверяем, что заметка не null и ID был присвоен
         assertNotNull(savedNote);
         assertNotNull(savedNote.getId());  // ID не должен быть null после сохранения
         assertEquals(1L, savedNote.getId());  // ID должен быть равен 1L
-
-        // Проверка, что метод persist был вызван
-        verify(entityManager, times(1)).persist(any(Note.class));
+        verify(entityManager, times(1)).persist(any(Note.class)); // Проверка, что метод persist был вызван
     }
 
     @Test
     public void testSave_ShouldUpdateNote_WhenNoteExists() {
         // Given: создаем заметку с ID 1L и мокаем вызов merge
-        note.setId(1L);
-        when(entityManager.merge(note)).thenReturn(note);
+        testNote.setId(1L);
+        when(entityManager.merge(testNote)).thenReturn(testNote);
 
         // When: вызываем метод save для обновления существующей заметки
-        Note updatedNote = noteRepository.save(note);
+        Note updatedNote = noteRepository.save(testNote);
 
         // Then: проверяем, что обновленная заметка не пуста
         assertNotNull(updatedNote);
-        assertEquals(note.getId(), updatedNote.getId());
-        verify(entityManager, times(1)).merge(note);  // Проверка, что был вызван метод merge
+        assertEquals(testNote.getId(), updatedNote.getId());
+        verify(entityManager, times(1)).merge(testNote); // Проверка, что был вызван метод merge
     }
 
     @Test
     public void testUpdate_ShouldReturnUpdatedNote_WhenNoteExists() {
         // Given: мокаем нахождение заметки и ее обновление
-        note.setId(1L);
-        when(entityManager.find(Note.class, 1L)).thenReturn(note);
-        when(entityManager.merge(note)).thenReturn(note);
+        testNote.setId(1L);
+        when(entityManager.find(Note.class, 1L)).thenReturn(testNote);
+        when(entityManager.merge(testNote)).thenReturn(testNote);
 
         // When: вызываем метод update для обновления заметки
-        Optional<Note> updatedNote = noteRepository.update(1L, note);
+        Optional<Note> updatedNote = noteRepository.update(1L, testNote);
 
         // Then: проверяем, что обновленная заметка существует и ID совпадает
         assertTrue(updatedNote.isPresent());
-        assertEquals(note.getId(), updatedNote.get().getId());
+        assertEquals(testNote.getId(), updatedNote.get().getId());
         verify(entityManager, times(1)).find(Note.class, 1L);  // Проверка нахождения заметки
-        verify(entityManager, times(1)).merge(note);  // Проверка, что merge был вызван
+        verify(entityManager, times(1)).merge(testNote);  // Проверка, что merge был вызван
     }
 
     @Test
     public void testDelete_ShouldDeleteNote_WhenNoteExists() {
         // Given: мокаем нахождение заметки с ID 1L
-        note.setId(1L);
-        when(entityManager.find(Note.class, 1L)).thenReturn(note);
+        testNote.setId(1L);
+        when(entityManager.find(Note.class, 1L)).thenReturn(testNote);
 
         // When: вызываем метод delete для удаления заметки
         noteRepository.deleteById(1L);
 
         // Then: проверяем, что метод remove был вызван
-        verify(entityManager, times(1)).remove(note);
+        verify(entityManager, times(1)).remove(testNote);
     }
 
     @Test
@@ -160,6 +175,6 @@ public class NoteRepositoryImplTest {
         noteRepository.deleteById(1L);
 
         // Then: проверяем, что метод remove не был вызван
-        verify(entityManager, times(0)).remove(any());  // Удаление не должно быть вызвано
+        verify(entityManager, times(0)).remove(any());
     }
 }
