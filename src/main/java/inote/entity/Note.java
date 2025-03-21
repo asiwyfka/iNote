@@ -34,16 +34,16 @@ public class Note implements Serializable {
 
     /**
      * Название заметки.
-     * Обязательное поле с максимальной длиной 255 символов.
+     * Обязательное поле с максимальной длиной 50 символов.
      */
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 50)
     private String title;
 
     /**
      * Содержимое заметки.
      * Обязательное поле, может содержать текст любого размера.
      */
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false)
     private String content;
 
     /**

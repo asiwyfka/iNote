@@ -46,7 +46,6 @@ public class NoteController {
     public ResponseEntity<Note> getNoteById(@PathVariable Long noteId) {
         log.info("getNoteById - start, noteId = {}", noteId);
         Optional<Note> note = noteService.findById(noteId);
-
         if (note.isEmpty()) {
             log.warn("getNoteById - заметка с ID {} не найдена", noteId);
             return ResponseEntity.notFound().build();
@@ -61,7 +60,6 @@ public class NoteController {
     public ResponseEntity<List<Note>> getNotesByTitle(@PathVariable String title) {
         log.info("getNotesByTitle - start, title = {}", title);
         List<Note> notes = noteService.findByTitle(title);
-
         if (notes.isEmpty()) {
             log.warn("getNotesByTitle - заметки с заголовком '{}' не найдены", title);
             return ResponseEntity.notFound().build();
@@ -87,7 +85,6 @@ public class NoteController {
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
         List<Note> notes = noteService.findByCreatedAtBetween(startDateTime, endDateTime);
-
         if (notes.isEmpty()) {
             log.warn("getNotesByCreatedAtBetween - заметки не найдены в указанный период");
             return ResponseEntity.notFound().build();
@@ -111,7 +108,6 @@ public class NoteController {
     public ResponseEntity<Note> updateNote(@PathVariable Long noteId, @RequestBody Note note) {
         log.info("updateNote - start, noteId = {}, note = {}", noteId, note);
         Optional<Note> updatedNote = noteService.update(noteId, note);
-
         if (updatedNote.isEmpty()) {
             log.warn("updateNote - заметка с ID {} не найдена", noteId);
             return ResponseEntity.notFound().build();
@@ -125,7 +121,6 @@ public class NoteController {
     @DeleteMapping("/{noteId}")
     public ResponseEntity<Void> deleteNote(@PathVariable Long noteId) {
         log.info("deleteNote - start, noteId = {}", noteId);
-
         Optional<Note> note = noteService.findById(noteId);
         if (note.isEmpty()) {
             log.warn("deleteNote - заметка с ID {} не найдена", noteId);

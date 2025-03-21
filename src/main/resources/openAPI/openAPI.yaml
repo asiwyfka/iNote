@@ -29,7 +29,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-        - Заметки
+        - Запросы изменяющие данные
       summary: Добавить новую заметку
       operationId: addNote
       requestBody:
@@ -39,7 +39,7 @@ paths:
             schema:
               $ref: '#/components/schemas/Note'
       responses:
-        '200':
+        '201':
           description: Заметка успешно добавлена
           content:
             application/json:
@@ -87,7 +87,7 @@ paths:
 
     put:
       tags:
-        - Заметки
+        - Запросы изменяющие данные
       summary: Обновить заметку
       operationId: updateNote
       parameters:
@@ -110,6 +110,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
+        '400':
+          description: Некорректный запрос (неправильный ID или тело)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Заметка не найдена
           content:
@@ -119,7 +125,7 @@ paths:
 
     delete:
       tags:
-        - Заметки
+        - Запросы изменяющие данные
       summary: Удалить заметку
       operationId: deleteNote
       parameters:
@@ -132,6 +138,12 @@ paths:
       responses:
         '204':
           description: Заметка удалена
+        '400':
+          description: Некорректный ID заметки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Заметка не найдена
           content:
@@ -212,6 +224,7 @@ components:
         - title
         - content
         - createdAt
+        - updatedAt
       properties:
         id:
           type: integer
@@ -221,6 +234,9 @@ components:
         content:
           type: string
         createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
 

@@ -42,7 +42,7 @@ class NoteServiceImplTest {
 
     @Test
     void findById_ShouldThrowNotFoundException_WhenNoteDoesNotExist() {
-        // Given: Мокируем репозиторий для возврата пустого Optional, что означает, что заметки не существует
+        // Given: мокируем репозиторий для возврата пустого Optional, что означает, что заметки не существует
         BDDMockito.given(noteRepository.findById(1L)).willReturn(Optional.empty());
 
         // When: вызываем метод поиска по ID
@@ -52,7 +52,7 @@ class NoteServiceImplTest {
 
     @Test
     void findById_ShouldReturnNote_WhenNoteExists() {
-        // Given: Мокируем репозиторий, чтобы он возвращал существующую заметку по ID
+        // Given: мокируем репозиторий, чтобы он возвращал существующую заметку по ID
         BDDMockito.given(noteRepository.findById(1L)).willReturn(Optional.of(testNote));
 
         // When: вызываем метод для поиска заметки по ID
@@ -66,7 +66,7 @@ class NoteServiceImplTest {
 
     @Test
     void save_ShouldSaveAndReturnNote() {
-        // Given: Мокируем репозиторий, чтобы он сохранял и возвращал новую заметку
+        // Given: мокируем репозиторий, чтобы он сохранял и возвращал новую заметку
         BDDMockito.given(noteRepository.save(ArgumentMatchers.any(Note.class))).willReturn(testNote);
 
         // When: сохраняем новую заметку с помощью метода save
@@ -79,7 +79,7 @@ class NoteServiceImplTest {
 
     @Test
     void deleteById_ShouldThrowNotFoundException_WhenNoteDoesNotExist() {
-        // Given: Мокируем репозиторий для возврата пустого Optional, что означает, что заметки нет в базе данных
+        // Given: мокируем репозиторий для возврата пустого Optional, что означает, что заметки нет в базе данных
         BDDMockito.given(noteRepository.findById(1L)).willReturn(Optional.empty());
 
         // When: вызываем метод удаления заметки
@@ -131,7 +131,7 @@ class NoteServiceImplTest {
 
     @Test
     void findAll_ShouldReturnAllNotes() {
-        // Given: Мокируем репозиторий для возврата списка заметок
+        // Given: мокируем репозиторий для возврата списка заметок
         List<Note> notes = List.of(testNote);
         BDDMockito.given(noteRepository.findAll()).willReturn(notes);
 

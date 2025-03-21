@@ -15,7 +15,7 @@ import java.util.Optional;
 
 /**
  * Реализация {@link NoteRepository}.
- * <p>
+ *
  * Использует {@link EntityManager} для взаимодействия с базой данных.
  *
  * @author Avdeyev Viktor
@@ -60,10 +60,12 @@ public class NoteRepositoryImpl implements NoteRepository {
     @Transactional(readOnly = true)
     public List<Note> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Поиск заметок, созданных между {} и {}", startDate, endDate);
-        List<Note> notes = entityManager.createQuery("SELECT n FROM Note n WHERE n.createdAt BETWEEN :startDate AND :endDate", Note.class)
-            .setParameter("startDate", startDate)
-            .setParameter("endDate", endDate)
-            .getResultList();
+        List<Note> notes =
+            entityManager.createQuery("SELECT n FROM Note n WHERE n.createdAt BETWEEN :startDate AND :endDate",
+                    Note.class)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
         log.info("Найдено {} заметок, созданных в указанный период", notes.size());
         return notes;
     }
@@ -73,12 +75,10 @@ public class NoteRepositoryImpl implements NoteRepository {
     public Note save(Note note) {
         log.info("Сохранение заметки: {}", note);
         if (note.getId() == null) {
-            // Новая заметка
             entityManager.persist(note);
             log.info("Новая заметка сохранена: {}", note);
             return note;
         } else {
-            // Обновление существующей заметки
             Note updatedNote = entityManager.merge(note);
             log.info("Заметка обновлена: {}", updatedNote);
             return updatedNote;
@@ -95,11 +95,9 @@ public class NoteRepositoryImpl implements NoteRepository {
             return Optional.empty();
         }
 
-        // Обновление только измененных полей
         Note note = optionalNote.get();
         note.setTitle(updatedNote.getTitle());
         note.setContent(updatedNote.getContent());
-
         note = entityManager.merge(note);
         log.info("Заметка обновлена: {}", note);
         return Optional.of(note);
