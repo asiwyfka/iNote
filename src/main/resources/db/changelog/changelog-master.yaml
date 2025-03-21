@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/create-notes-table.yaml
+  - changeSet:
+      id: insert-note
+      author: Avdeyev Viktor
+      changes:
+        - sqlFile:
+            path: db/changelog/changeset/insert-note.sql
+            splitStatements: true
+            endDelimiter: ";"
